@@ -54,10 +54,13 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.material)
 
-    implementation (libs.mpandroidchart)
+    implementation(libs.mpandroidchart)
 
-    implementation (libs.hilt.android)
-    implementation (libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

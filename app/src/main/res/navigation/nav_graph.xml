@@ -3,26 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/EnterPointsFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.example.pointvisualizer.EnterPointsFragment"
+        android:id="@+id/EnterPointsFragment"
+        android:name="com.example.pointvisualizer.ui.enterpoints.EnterPointsFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        tools:layout="@layout/fragment_enter_points">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_EnterPointsFragment_to_GraphFragment"
+            app:destination="@id/GraphFragment" />
     </fragment>
+
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.pointvisualizer.GraphFragment"
+        android:id="@+id/GraphFragment"
+        android:name="com.example.pointvisualizer.ui.graph.GraphFragment"
         android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        tools:layout="@layout/fragment_graph">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_GraphFragment_to_EnterPointsFragment"
+            app:destination="@id/EnterPointsFragment" />
     </fragment>
 </navigation>
