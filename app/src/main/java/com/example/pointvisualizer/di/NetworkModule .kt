@@ -1,6 +1,6 @@
 package com.example.pointvisualizer.di
 
-import com.example.pointvisualizer.PointsApi
+import com.example.pointvisualizer.features.points.api.retrofit.PointsApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
