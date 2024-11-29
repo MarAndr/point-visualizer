@@ -1,6 +1,5 @@
-package com.example.pointvisualizer.di
+package com.example.pointvisualizer.features.core.di
 
-import com.example.pointvisualizer.features.points.api.retrofit.PointsApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,11 +19,5 @@ object NetworkModule {
             .baseUrl("https://hr-challenge.dev.tapyou.com/v2/api-docs?group=mobile")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideApiService(retrofit: Retrofit): PointsApi {
-        return retrofit.create(PointsApi::class.java)
     }
 }
