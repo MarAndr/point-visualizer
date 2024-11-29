@@ -11,14 +11,21 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.example.pointvisualizer.R
 import com.example.pointvisualizer.databinding.FragmentEnterPointsBinding
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsRequestState
+import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class EnterPointsFragment : Fragment() {
+
+    companion object{
+        const val POINTS_ARGS = "POINTS"
+    }
 
     private var _binding: FragmentEnterPointsBinding? = null
     private val binding get() = _binding!!
@@ -49,14 +56,38 @@ class EnterPointsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.screenState.collect { screenState ->
-                    binding.goButton.isEnabled = screenState.validInput &&
-                            screenState.enterPointsState !is EnterPointsRequestState.Loading
+                    updateUI(screenState)
 
-                    binding.loadingIndicator.isVisible =
-                        screenState.enterPointsState is EnterPointsRequestState.Loading
+                    if (shouldNavigateToGraphFragment(screenState)){
+                        navigateToGraphFragment(screenState)
+                    }
                 }
             }
         }
+    }
+
+    private fun shouldNavigateToGraphFragment(screenState: EnterPointsScreenState): Boolean {
+        return screenState.enterPointsState is EnterPointsRequestState.Data &&
+                screenState.enterPointsState.points.points.isNotEmpty()
+    }
+
+    private fun navigateToGraphFragment(screenState: EnterPointsScreenState) {
+        val points = (screenState.enterPointsState as EnterPointsRequestState.Data).points.points
+        val bundle = Bundle().apply {
+            putParcelableArrayList(POINTS_ARGS, ArrayList(points))
+        }
+        findNavController().navigate(
+            R.id.action_EnterPointsFragment_to_GraphFragment,
+            bundle
+        )
+    }
+
+    private fun updateUI(screenState: EnterPointsScreenState) {
+        binding.goButton.isEnabled = screenState.validInput &&
+                screenState.enterPointsState !is EnterPointsRequestState.Loading
+
+        binding.loadingIndicator.isVisible =
+            screenState.enterPointsState is EnterPointsRequestState.Loading
     }
 
     override fun onDestroyView() {

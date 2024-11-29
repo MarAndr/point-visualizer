@@ -6,27 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.pointvisualizer.databinding.FragmentGraphBinding
+import com.example.pointvisualizer.features.points.entities.Point
+import com.example.pointvisualizer.ui.enterpoints.EnterPointsFragment
 
 
-/**
- * A simple [Fragment] subclass as the second destination in the navigation.
- */
 class GraphFragment : Fragment() {
 
     private var _binding: FragmentGraphBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+
+    val points by lazy {
+        arguments?.getSerializable(EnterPointsFragment.POINTS_ARGS) as? ArrayList<Point>
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentGraphBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
