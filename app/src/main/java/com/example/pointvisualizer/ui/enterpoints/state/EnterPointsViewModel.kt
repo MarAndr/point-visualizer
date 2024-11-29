@@ -10,25 +10,28 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EnterPointsViewModel @Inject constructor(
+internal class EnterPointsViewModel @Inject constructor(
     private val repository: IPointsDataRepository,
 ) : ViewModel() {
 
-    private val enteredPointsState = MutableStateFlow<Int?>(null)
+    private val enteredPointsState = MutableStateFlow("")
     private val pointsRequestState =
-        MutableStateFlow<EnterPointsRequestState>(EnterPointsRequestState.Loading)
+        MutableStateFlow<EnterPointsRequestState>(EnterPointsRequestState.Idle)
 
-    private val screenState = combine(
+    val screenState = combine(
         enteredPointsState,
         pointsRequestState
     ) { enteredPoints, pointsRequest ->
+        val enteredPointsInt = enteredPoints.toIntOrNull()
         EnterPointsScreenState(
-            enteredPoints,
-            pointsRequest,
+            validInput = enteredPointsInt != null && enteredPointsInt in enteredPointsRange,
+            enterPointsState = pointsRequest,
         )
     }
 
-    fun getPoints(count: Int) {
+    fun getPoints(countString: String) {
+        val count = countString.toIntOrNull() ?: return
+
         viewModelScope.launch {
             pointsRequestState.value = EnterPointsRequestState.Loading
             try {
@@ -40,5 +43,13 @@ class EnterPointsViewModel @Inject constructor(
                 pointsRequestState.value = EnterPointsRequestState.Error(e)
             }
         }
+    }
+
+    fun onCountTextChanged(countString: String) {
+        enteredPointsState.value = countString
+    }
+
+    companion object {
+        private val enteredPointsRange = 1..1000
     }
 }
