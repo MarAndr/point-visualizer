@@ -11,7 +11,7 @@
     <string name="unknown_error">Неизвестная ошибка. Повторите попытку</string>
     <string name="header_x">X</string>
     <string name="header_y">Y</string>
-    <string name="enter_points_title">Количество точек для отображения на графике</string>
+    <string name="enter_points_title">Количество точек для отображения на графике:</string>
     <string name="enter_points_hint">Введите количество точек</string>
     <string name="button_go_text">Поехали</string>
 </resources>

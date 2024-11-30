@@ -16,9 +16,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.pointvisualizer.R
 import com.example.pointvisualizer.databinding.FragmentEnterPointsBinding
+import com.example.pointvisualizer.features.points.entities.PointsList
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsRequestState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
+import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -60,12 +62,15 @@ class EnterPointsFragment : Fragment() {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.screenState.collect { screenState ->
                     updateUI(screenState)
+                }
+            }
+        }
 
-                    // todo move to viewmodel
-                    if (screenState.enterPointsState is EnterPointsRequestState.Data &&
-                        screenState.enterPointsState.points.points.isNotEmpty()
-                    ) {
-                        navigateToGraphFragment(screenState.enterPointsState)
+        viewLifecycleOwner.lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.enteredPointsEvent.collect{ event ->
+                    if (event is EnteredPointsEvent.NavigateToGraphFragment){
+                        navigateToGraphFragment(event.points)
                     }
                 }
             }
@@ -78,8 +83,7 @@ class EnterPointsFragment : Fragment() {
         inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    private fun navigateToGraphFragment(enterPointsState: EnterPointsRequestState.Data) {
-        val points = enterPointsState.points
+    private fun navigateToGraphFragment(points: PointsList) {
         val bundle = Bundle().apply {
             putParcelable(POINTS_ARGS, points)
         }

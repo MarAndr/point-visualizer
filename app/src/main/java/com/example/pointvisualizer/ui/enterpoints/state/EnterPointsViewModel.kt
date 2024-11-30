@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pointvisualizer.features.points.abstractions.IPointsDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +24,9 @@ internal class EnterPointsViewModel @Inject constructor(
     private val enteredPointsState = MutableStateFlow("")
     private val pointsRequestState =
         MutableStateFlow<EnterPointsRequestState>(EnterPointsRequestState.Idle)
+
+    private val _enteredPointsEvent = MutableSharedFlow<EnteredPointsEvent>()
+    val enteredPointsEvent: SharedFlow<EnteredPointsEvent> = _enteredPointsEvent
 
     val screenState = combine(
         enteredPointsState,
@@ -48,6 +53,7 @@ internal class EnterPointsViewModel @Inject constructor(
                 pointsRequestState.value = EnterPointsRequestState.Data(
                     points = points
                 )
+                _enteredPointsEvent.emit(EnteredPointsEvent.NavigateToGraphFragment(points))
             } catch (e: Exception) {
                 pointsRequestState.value = EnterPointsRequestState.Error(e)
             }
