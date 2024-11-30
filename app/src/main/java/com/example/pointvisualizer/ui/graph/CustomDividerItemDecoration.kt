@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.recyclerview.widget.RecyclerView
 
+//todo попробовать починить отображение вертикальных линий
 class CustomDividerItemDecoration(private val dividerWidth: Int, private val color: Int) : RecyclerView.ItemDecoration() {
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {

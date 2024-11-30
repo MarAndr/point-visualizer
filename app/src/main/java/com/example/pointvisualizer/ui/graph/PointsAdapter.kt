@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pointvisualizer.R
 import com.example.pointvisualizer.features.points.entities.Point
+import java.text.NumberFormat
+import java.util.Locale
 
 class PointsAdapter : ListAdapter<Point, RecyclerView.ViewHolder>(PointsDiffCallback()) {
 
@@ -17,14 +19,26 @@ class PointsAdapter : ListAdapter<Point, RecyclerView.ViewHolder>(PointsDiffCall
         const val TYPE_ITEM = 1
     }
 
-    inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val headerXTextView: TextView = itemView.findViewById(R.id.headerX)
-        val headerYTextView: TextView = itemView.findViewById(R.id.headerY)
+    inner class PointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val xTextView: TextView = itemView.findViewById(R.id.xTextView)
+        private val yTextView: TextView = itemView.findViewById(R.id.yTextView)
+
+        fun bind(point: Point) {
+            val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+            xTextView.text = numberFormat.format(point.x)
+            yTextView.text = numberFormat.format(point.y)
+        }
     }
 
-    inner class PointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val xTextView: TextView = itemView.findViewById(R.id.xTextView)
-        val yTextView: TextView = itemView.findViewById(R.id.yTextView)
+    inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val headerXTextView: TextView = itemView.findViewById(R.id.headerX)
+        private val headerYTextView: TextView = itemView.findViewById(R.id.headerY)
+
+        fun bind() {
+            val context = itemView.context
+            headerXTextView.text = context.getString(R.string.header_x)
+            headerYTextView.text = context.getString(R.string.header_y)
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -42,13 +56,12 @@ class PointsAdapter : ListAdapter<Point, RecyclerView.ViewHolder>(PointsDiffCall
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is PointViewHolder) {
-            val point = getItem(position - 1) // -1 потому что первый элемент — это заголовок
-            holder.xTextView.text = point.x.toString()
-            holder.yTextView.text = point.y.toString()
-        } else if (holder is HeaderViewHolder) {
-            holder.headerXTextView.text = "X"
-            holder.headerYTextView.text = "Y"
+        when (holder) {
+            is PointViewHolder -> {
+                val point = getItem(position - 1)
+                holder.bind(point)
+            }
+            is HeaderViewHolder -> holder.bind()
         }
     }
 

@@ -92,15 +92,15 @@ class EnterPointsFragment : Fragment() {
     private fun updateUI(screenState: EnterPointsScreenState) {
         binding.goButton.isEnabled = screenState.validInput.isValid &&
                 screenState.enterPointsState !is EnterPointsRequestState.Loading
-        binding.pointsInput.error = when {
+        binding.pointsInputLayout.error = when {
             !screenState.validInput.isNotEmpty -> {
                 null
             }
             !screenState.validInput.isLessThanMax -> {
-                "больше 1000"
+                getString(R.string.more_than_1000_points_error)
             }
             !screenState.validInput.isMoreThanMin -> {
-                "меньше 1"
+                getString(R.string.less_than_one_point_error)
             }
             else -> {
                 null
@@ -114,7 +114,7 @@ class EnterPointsFragment : Fragment() {
 
         if (screenState.enterPointsState is EnterPointsRequestState.Error) {
             hideKeyboard()
-            val errorMessage = (screenState.enterPointsState).e.message ?: "Неизвестная ошибка. Повторите попытку"
+            val errorMessage = (screenState.enterPointsState).e.message ?: getString(R.string.unknown_error)
             Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
         }
     }

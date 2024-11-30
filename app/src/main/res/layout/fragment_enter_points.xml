@@ -1,23 +1,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/infoText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="8dp"
-        android:text="Введите количество точек для запроса"
-        android:textSize="16sp" />
+        android:paddingBottom="32dp"
+        android:gravity="center_horizontal"
+        android:text="@string/enter_points_title"
+        android:textSize="32sp" />
 
-    <EditText
-        android:id="@+id/pointsInput"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/pointsInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Введите количество точек"
-        android:inputType="number" />
+        app:errorEnabled="true">
+        <EditText
+            android:id="@+id/pointsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="quantity"
+            android:hint="@string/enter_points_hint"
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -29,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Поехали" />
+            android:text="@string/button_go_text" />
 
         <ProgressBar
             android:id="@+id/loadingIndicator"
