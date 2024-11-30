@@ -1,7 +1,6 @@
 package com.example.pointvisualizer.ui.graph
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pointvisualizer.databinding.FragmentGraphBinding
-import com.example.pointvisualizer.features.points.entities.Point
-import com.example.pointvisualizer.ui.enterpoints.EnterPointsFragment
 import com.example.pointvisualizer.ui.graph.state.GraphViewModel
 import kotlinx.coroutines.launch
 
@@ -25,8 +24,8 @@ class GraphFragment : Fragment() {
 
     private val viewModel by viewModels<GraphViewModel>()
 
-    val points by lazy {
-        arguments?.getSerializable(EnterPointsFragment.POINTS_ARGS) as? ArrayList<Point>
+    private val adapter by lazy {
+        PointsAdapter(emptyList())
     }
 
     override fun onCreateView(
@@ -39,10 +38,16 @@ class GraphFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.pointsTable.adapter = adapter
+        binding.pointsTable.layoutManager = LinearLayoutManager(requireContext())
+        val dividerItemDecoration = DividerItemDecoration(binding.pointsTable.context, DividerItemDecoration.VERTICAL)
+        binding.pointsTable.addItemDecoration(dividerItemDecoration)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.points.collect { state ->
-                    Log.d("GraphFragment", "Received points: ${state?.points}")
+                    if (state != null) {
+                        state.points?.let { adapter.updateData(it) }
+                    }
                 }
             }
         }
