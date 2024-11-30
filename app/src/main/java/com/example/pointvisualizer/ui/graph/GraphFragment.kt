@@ -31,7 +31,7 @@ class GraphFragment : Fragment() {
     private val viewModel by viewModels<GraphViewModel>()
 
     private val adapter by lazy {
-        PointsAdapter(emptyList())
+        PointsAdapter()
     }
 
     override fun onCreateView(
@@ -64,8 +64,7 @@ class GraphFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.points.collect { state ->
-                    // todo ListAdapter
-                    adapter.updateData(state.points)
+                    adapter.submitList(state.points)
                     setUpGraph(state.points)
                 }
             }
@@ -76,7 +75,7 @@ class GraphFragment : Fragment() {
         val entries = pointsList.map { point ->
             Entry(point.x, point.y)
         }
-        val dataSet = LineDataSet(entries, "Points")
+        val dataSet = LineDataSet(entries, "")
         dataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
         dataSet.color = ContextCompat.getColor(requireContext(), R.color.accentOnBackground)
         dataSet.setDrawCircles(false)

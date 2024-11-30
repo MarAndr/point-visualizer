@@ -5,12 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pointvisualizer.R
 import com.example.pointvisualizer.features.points.entities.Point
 
-class PointsAdapter(private var points: List<Point>) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PointsAdapter : ListAdapter<Point, RecyclerView.ViewHolder>(PointsDiffCallback()) {
 
     companion object {
         const val TYPE_HEADER = 0
@@ -43,7 +43,7 @@ class PointsAdapter(private var points: List<Point>) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is PointViewHolder) {
-            val point = points[position - 1] // -1 так как первый элемент — это заголовок
+            val point = getItem(position - 1) // -1 потому что первый элемент — это заголовок
             holder.xTextView.text = point.x.toString()
             holder.yTextView.text = point.y.toString()
         } else if (holder is HeaderViewHolder) {
@@ -52,31 +52,17 @@ class PointsAdapter(private var points: List<Point>) :
         }
     }
 
-    override fun getItemCount(): Int = points.size + 1
-
-    fun updateData(newPoints: List<Point>) {
-        val diffCallback = PointsDiffCallback(points, newPoints)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        points = newPoints
-        diffResult.dispatchUpdatesTo(this)
+    override fun getItemCount(): Int {
+        return super.getItemCount() + 1
     }
 }
 
-class PointsDiffCallback(
-    private val oldList: List<Point>,
-    private val newList: List<Point>
-) : DiffUtil.Callback() {
-
-    override fun getOldListSize(): Int = oldList.size
-
-    override fun getNewListSize(): Int = newList.size
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].x == newList[newItemPosition].x &&
-                oldList[oldItemPosition].y == newList[newItemPosition].y
+class PointsDiffCallback : DiffUtil.ItemCallback<Point>() {
+    override fun areItemsTheSame(oldItem: Point, newItem: Point): Boolean {
+        return oldItem.x == newItem.x && oldItem.y == newItem.y
     }
 
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition] == newList[newItemPosition]
+    override fun areContentsTheSame(oldItem: Point, newItem: Point): Boolean {
+        return oldItem == newItem
     }
 }
