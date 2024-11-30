@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">@color/black</color>
+    <color name="onBackground">@color/white</color>
+    <color name="accentOnBackground">#03A9F4</color>
+</resources>

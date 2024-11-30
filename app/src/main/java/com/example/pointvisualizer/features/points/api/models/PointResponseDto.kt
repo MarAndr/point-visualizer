@@ -9,6 +9,6 @@ data class PointResponseDto(
 )
 
 data class PointDto(
-    val x: Double,
-    val y: Double,
+    val x: Float,
+    val y: Float,
 )

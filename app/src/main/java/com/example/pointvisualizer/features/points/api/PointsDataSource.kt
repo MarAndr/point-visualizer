@@ -8,6 +8,7 @@ import javax.inject.Inject
 class PointsDataSource @Inject constructor(
     private val api: PointsApi,
 ): IPointsDataSource {
+    // todo convert to flow
     override suspend fun getPoints(count: Int): PointResponseDto {
         return api.getPoints(count)
     }

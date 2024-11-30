@@ -61,17 +61,15 @@ class EnterPointsFragment : Fragment() {
                 viewModel.screenState.collect { screenState ->
                     updateUI(screenState)
 
-                    if (shouldNavigateToGraphFragment(screenState)) {
-                        navigateToGraphFragment(screenState)
+                    // todo move to viewmodel
+                    if (screenState.enterPointsState is EnterPointsRequestState.Data &&
+                        screenState.enterPointsState.points.points.isNotEmpty()
+                    ) {
+                        navigateToGraphFragment(screenState.enterPointsState)
                     }
                 }
             }
         }
-    }
-
-    private fun shouldNavigateToGraphFragment(screenState: EnterPointsScreenState): Boolean {
-        return screenState.enterPointsState is EnterPointsRequestState.Data &&
-                screenState.enterPointsState.points.points.isNotEmpty()
     }
 
     private fun hideKeyboard(){
@@ -80,10 +78,10 @@ class EnterPointsFragment : Fragment() {
         inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    private fun navigateToGraphFragment(screenState: EnterPointsScreenState) {
-        val points = (screenState.enterPointsState as EnterPointsRequestState.Data).points.points
+    private fun navigateToGraphFragment(enterPointsState: EnterPointsRequestState.Data) {
+        val points = enterPointsState.points
         val bundle = Bundle().apply {
-            putParcelableArrayList(POINTS_ARGS, ArrayList(points))
+            putParcelable(POINTS_ARGS, points)
         }
         findNavController().navigate(
             R.id.action_EnterPointsFragment_to_GraphFragment,
