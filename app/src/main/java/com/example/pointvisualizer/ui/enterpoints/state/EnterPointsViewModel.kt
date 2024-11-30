@@ -14,6 +14,10 @@ internal class EnterPointsViewModel @Inject constructor(
     private val repository: IPointsDataRepository,
 ) : ViewModel() {
 
+    companion object {
+        private val enteredPointsRange = 1..1000
+    }
+
     private val enteredPointsState = MutableStateFlow("")
     private val pointsRequestState =
         MutableStateFlow<EnterPointsRequestState>(EnterPointsRequestState.Idle)
@@ -47,9 +51,5 @@ internal class EnterPointsViewModel @Inject constructor(
 
     fun onCountTextChanged(countString: String) {
         enteredPointsState.value = countString
-    }
-
-    companion object {
-        private val enteredPointsRange = 1..1000
     }
 }

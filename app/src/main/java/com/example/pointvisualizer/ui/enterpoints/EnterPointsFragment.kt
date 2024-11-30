@@ -1,9 +1,11 @@
 package com.example.pointvisualizer.ui.enterpoints
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -17,13 +19,14 @@ import com.example.pointvisualizer.databinding.FragmentEnterPointsBinding
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsRequestState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class EnterPointsFragment : Fragment() {
 
-    companion object{
+    companion object {
         const val POINTS_ARGS = "POINTS"
     }
 
@@ -58,7 +61,7 @@ class EnterPointsFragment : Fragment() {
                 viewModel.screenState.collect { screenState ->
                     updateUI(screenState)
 
-                    if (shouldNavigateToGraphFragment(screenState)){
+                    if (shouldNavigateToGraphFragment(screenState)) {
                         navigateToGraphFragment(screenState)
                     }
                 }
@@ -69,6 +72,12 @@ class EnterPointsFragment : Fragment() {
     private fun shouldNavigateToGraphFragment(screenState: EnterPointsScreenState): Boolean {
         return screenState.enterPointsState is EnterPointsRequestState.Data &&
                 screenState.enterPointsState.points.points.isNotEmpty()
+    }
+
+    private fun hideKeyboard(){
+        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val view = requireActivity().currentFocus
+        inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun navigateToGraphFragment(screenState: EnterPointsScreenState) {
@@ -88,6 +97,15 @@ class EnterPointsFragment : Fragment() {
 
         binding.loadingIndicator.isVisible =
             screenState.enterPointsState is EnterPointsRequestState.Loading
+
+        binding.pointsInput.isEnabled =
+            screenState.enterPointsState !is EnterPointsRequestState.Loading
+
+        if (screenState.enterPointsState is EnterPointsRequestState.Error) {
+            hideKeyboard()
+            val errorMessage = (screenState.enterPointsState).e.message ?: "Неизвестная ошибка. Повторите попытку"
+            Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     override fun onDestroyView() {
