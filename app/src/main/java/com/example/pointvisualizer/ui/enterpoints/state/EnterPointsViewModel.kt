@@ -15,7 +15,8 @@ internal class EnterPointsViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        private val enteredPointsRange = 1..1000
+        private const val ENTERED_POINTS_COUNT_MIN = 1
+        private const val ENTERED_POINTS_COUNT_MAX = 1000
     }
 
     private val enteredPointsState = MutableStateFlow("")
@@ -28,7 +29,11 @@ internal class EnterPointsViewModel @Inject constructor(
     ) { enteredPoints, pointsRequest ->
         val enteredPointsInt = enteredPoints.toIntOrNull()
         EnterPointsScreenState(
-            validInput = enteredPointsInt != null && enteredPointsInt in enteredPointsRange,
+            validInput = EnterPointsValidationState(
+                isNotEmpty = enteredPoints.isNotBlank(),
+                isLessThanMax = enteredPointsInt != null && enteredPointsInt <= ENTERED_POINTS_COUNT_MAX,
+                isMoreThanMin =  enteredPointsInt != null && enteredPointsInt >= ENTERED_POINTS_COUNT_MIN,
+            ),
             enterPointsState = pointsRequest,
         )
     }

@@ -92,9 +92,22 @@ class EnterPointsFragment : Fragment() {
     }
 
     private fun updateUI(screenState: EnterPointsScreenState) {
-        binding.goButton.isEnabled = screenState.validInput &&
+        binding.goButton.isEnabled = screenState.validInput.isValid &&
                 screenState.enterPointsState !is EnterPointsRequestState.Loading
-
+        binding.pointsInput.error = when {
+            !screenState.validInput.isNotEmpty -> {
+                null
+            }
+            !screenState.validInput.isLessThanMax -> {
+                "больше 1000"
+            }
+            !screenState.validInput.isMoreThanMin -> {
+                "меньше 1"
+            }
+            else -> {
+                null
+            }
+        }
         binding.loadingIndicator.isVisible =
             screenState.enterPointsState is EnterPointsRequestState.Loading
 
