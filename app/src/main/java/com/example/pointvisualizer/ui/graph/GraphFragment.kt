@@ -1,9 +1,15 @@
 package com.example.pointvisualizer.ui.graph
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -34,6 +40,16 @@ class GraphFragment : Fragment() {
         PointsAdapter()
     }
 
+    private val fileSaveResult = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode != Activity.RESULT_OK) {
+            return@registerForActivityResult
+        }
+
+        val uri = result.data?.data
+            ?: return@registerForActivityResult
+        saveGraphToFile(uri)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -61,6 +77,10 @@ class GraphFragment : Fragment() {
         binding.lineChart.axisRight.textColor =
             ContextCompat.getColor(requireContext(), R.color.onBackground)
 
+        binding.saveToFile.setOnClickListener {
+            createFile()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.points.collect { state ->
@@ -69,6 +89,38 @@ class GraphFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun saveGraphToFile(uri: Uri) {
+        val bitmap = Bitmap.createBitmap(
+            binding.lineChart.measuredWidth,
+            binding.lineChart.measuredHeight,
+            Bitmap.Config.ARGB_8888
+        ).also {
+            Canvas(it).apply {
+                binding.lineChart.background?.draw(this)
+                binding.lineChart.draw(this)
+            }
+        }
+
+        try {
+            val outputStream = requireContext().contentResolver.openOutputStream(uri)!!
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun createFile() {
+        val fileName = "graph_${System.currentTimeMillis()}.png"
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/png"
+            putExtra(Intent.EXTRA_TITLE, fileName)
+        }
+        fileSaveResult.launch(intent)
     }
 
     private fun setUpGraph(pointsList: List<Point>) {

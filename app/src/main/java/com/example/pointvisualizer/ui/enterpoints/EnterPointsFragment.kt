@@ -24,6 +24,9 @@ import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
 import com.example.pointvisualizer.ui.enterpoints.state.ErrorType
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -66,11 +69,33 @@ class EnterPointsFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.screenState
+                    .map { it.enterPointsState }
+                    .filterIsInstance<EnterPointsRequestState.Error>()
+                    .distinctUntilChanged()
+                    .collect { error ->
+                        hideKeyboard()
+                        val errorMessage = when (val errorType = error.errorType) {
+                            is ErrorType.Network -> getString(R.string.error_network)
+                            is ErrorType.Server -> {
+                                val serverMessage =
+                                    errorType.message ?: getString(R.string.error_unexpected)
+                                getString(R.string.error_server, serverMessage)
+                            }
+
+                            is ErrorType.Unexpected -> getString(R.string.error_unexpected)
+                        }
+                        Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
+                    }
+            }
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.enteredPointsEvent.collect{ event ->
-                    if (event is EnteredPointsEvent.NavigateToGraphFragment){
+                viewModel.enteredPointsEvent.collect { event ->
+                    if (event is EnteredPointsEvent.NavigateToGraphFragment) {
                         navigateToGraphFragment(event.points)
                     }
                 }
@@ -78,10 +103,14 @@ class EnterPointsFragment : Fragment() {
         }
     }
 
-    private fun hideKeyboard(){
-        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    private fun hideKeyboard() {
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         val view = requireActivity().currentFocus
-        inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        inputMethodManager?.hideSoftInputFromWindow(
+            view?.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS
+        )
     }
 
     private fun navigateToGraphFragment(points: PointsList) {
@@ -101,12 +130,15 @@ class EnterPointsFragment : Fragment() {
             !screenState.validInput.isNotEmpty -> {
                 null
             }
+
             !screenState.validInput.isLessThanMax -> {
                 getString(R.string.more_than_1000_points_error)
             }
+
             !screenState.validInput.isMoreThanMin -> {
                 getString(R.string.less_than_one_point_error)
             }
+
             else -> {
                 null
             }
@@ -116,19 +148,6 @@ class EnterPointsFragment : Fragment() {
 
         binding.pointsInput.isEnabled =
             screenState.enterPointsState !is EnterPointsRequestState.Loading
-
-        if (screenState.enterPointsState is EnterPointsRequestState.Error) {
-            hideKeyboard()
-            val errorMessage = when (val errorType = screenState.enterPointsState.errorType) {
-                is ErrorType.Network -> getString(R.string.error_network)
-                is ErrorType.Server -> {
-                    val serverMessage = errorType.message ?: getString(R.string.error_unexpected)
-                    getString(R.string.error_server, serverMessage)
-                }
-                is ErrorType.Unexpected -> getString(R.string.error_unexpected)
-            }
-            Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
-        }
     }
 
     override fun onDestroyView() {
