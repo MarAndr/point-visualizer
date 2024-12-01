@@ -75,12 +75,15 @@ class GraphFragment : Fragment() {
         val entries = pointsList.map { point ->
             Entry(point.x, point.y)
         }
-        val dataSet = LineDataSet(entries, "")
-        dataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
-        dataSet.color = ContextCompat.getColor(requireContext(), R.color.accentOnBackground)
-        dataSet.setDrawCircles(false)
-        dataSet.lineWidth = 2f
-        dataSet.valueTextSize = 0f
+        val dataSet = LineDataSet(entries, "").apply {
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            color = ContextCompat.getColor(requireContext(), R.color.accentOnBackground)
+            setDrawCircles(true)
+            lineWidth = 2f
+            valueTextSize = 0f
+            circleRadius = 2f
+        }
+
         binding.lineChart.data = LineData(dataSet)
         binding.lineChart.invalidate()
     }
