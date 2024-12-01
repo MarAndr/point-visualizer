@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,8 +56,19 @@ internal class EnterPointsViewModel @Inject constructor(
                     points = points
                 )
                 _enteredPointsEvent.emit(EnteredPointsEvent.NavigateToGraphFragment(points))
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                pointsRequestState.value = EnterPointsRequestState.Error(
+                    ErrorType.Server(errorBody)
+                )
+            } catch (e: IOException) {
+                pointsRequestState.value = EnterPointsRequestState.Error(
+                    ErrorType.Network
+                )
             } catch (e: Exception) {
-                pointsRequestState.value = EnterPointsRequestState.Error(e)
+                pointsRequestState.value = EnterPointsRequestState.Error(
+                    ErrorType.Unexpected
+                )
             }
         }
     }

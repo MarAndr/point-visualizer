@@ -21,6 +21,7 @@ import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsRequestState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
+import com.example.pointvisualizer.ui.enterpoints.state.ErrorType
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -118,7 +119,14 @@ class EnterPointsFragment : Fragment() {
 
         if (screenState.enterPointsState is EnterPointsRequestState.Error) {
             hideKeyboard()
-            val errorMessage = (screenState.enterPointsState).e.message ?: getString(R.string.unknown_error)
+            val errorMessage = when (val errorType = screenState.enterPointsState.errorType) {
+                is ErrorType.Network -> getString(R.string.error_network)
+                is ErrorType.Server -> {
+                    val serverMessage = errorType.message ?: getString(R.string.error_unexpected)
+                    getString(R.string.error_server, serverMessage)
+                }
+                is ErrorType.Unexpected -> getString(R.string.error_unexpected)
+            }
             Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
         }
     }

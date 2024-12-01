@@ -14,4 +14,7 @@
     <string name="enter_points_title">Количество точек для отображения на графике:</string>
     <string name="enter_points_hint">Введите количество точек</string>
     <string name="button_go_text">Поехали</string>
+    <string name="error_network">Ошибка сети: проверьте ваше подключение.</string>
+    <string name="error_server">Ошибка сервера: %1$s</string>
+    <string name="error_unexpected">Произошла непредвиденная ошибка.</string>
 </resources>
