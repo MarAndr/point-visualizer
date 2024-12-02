@@ -12,8 +12,6 @@ sealed interface EnterPointsRequestState {
 
     data object Loading : EnterPointsRequestState
 
-    data class Error(val errorType: ErrorType) : EnterPointsRequestState
-
     data class Data(
         val points: PointsList,
     ) : EnterPointsRequestState
@@ -27,8 +25,3 @@ data class EnterPointsValidationState(
     val isValid = isNotEmpty && isMoreThanMin && isLessThanMax
 }
 
-sealed class ErrorType {
-    data object Network : ErrorType()
-    class Server(val message: String?) : ErrorType()
-    data object Unexpected : ErrorType()
-}

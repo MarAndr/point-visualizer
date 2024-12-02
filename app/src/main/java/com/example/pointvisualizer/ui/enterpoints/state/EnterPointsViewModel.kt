@@ -57,18 +57,21 @@ internal class EnterPointsViewModel @Inject constructor(
                 )
                 _enteredPointsEvent.emit(EnteredPointsEvent.NavigateToGraphFragment(points))
             } catch (e: HttpException) {
+                pointsRequestState.value = EnterPointsRequestState.Idle
                 val errorBody = e.response()?.errorBody()?.string()
-                pointsRequestState.value = EnterPointsRequestState.Error(
+                _enteredPointsEvent.emit(EnteredPointsEvent.Error(
                     ErrorType.Server(errorBody)
-                )
+                ))
             } catch (e: IOException) {
-                pointsRequestState.value = EnterPointsRequestState.Error(
+                pointsRequestState.value = EnterPointsRequestState.Idle
+                _enteredPointsEvent.emit(EnteredPointsEvent.Error(
                     ErrorType.Network
-                )
+                ))
             } catch (e: Exception) {
-                pointsRequestState.value = EnterPointsRequestState.Error(
+                pointsRequestState.value = EnterPointsRequestState.Idle
+                _enteredPointsEvent.emit(EnteredPointsEvent.Error(
                     ErrorType.Unexpected
-                )
+                ))
             }
         }
     }

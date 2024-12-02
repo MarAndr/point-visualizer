@@ -24,9 +24,6 @@ import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
 import com.example.pointvisualizer.ui.enterpoints.state.ErrorType
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -69,15 +66,16 @@ class EnterPointsFragment : Fragment() {
                 }
             }
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.screenState
-                    .map { it.enterPointsState }
-                    .filterIsInstance<EnterPointsRequestState.Error>()
-                    .distinctUntilChanged()
-                    .collect { error ->
+                viewModel.enteredPointsEvent.collect { event ->
+                    if (event is EnteredPointsEvent.NavigateToGraphFragment) {
+                        navigateToGraphFragment(event.points)
+                    }
+                    if (event is EnteredPointsEvent.Error) {
                         hideKeyboard()
-                        val errorMessage = when (val errorType = error.errorType) {
+                        val errorMessage = when (val errorType = event.errorType) {
                             is ErrorType.Network -> getString(R.string.error_network)
                             is ErrorType.Server -> {
                                 val serverMessage =
@@ -88,15 +86,6 @@ class EnterPointsFragment : Fragment() {
                             is ErrorType.Unexpected -> getString(R.string.error_unexpected)
                         }
                         Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
-                    }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.enteredPointsEvent.collect { event ->
-                    if (event is EnteredPointsEvent.NavigateToGraphFragment) {
-                        navigateToGraphFragment(event.points)
                     }
                 }
             }
