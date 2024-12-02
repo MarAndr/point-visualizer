@@ -1,11 +1,9 @@
 package com.example.pointvisualizer.ui.enterpoints
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -22,6 +20,7 @@ import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
 import com.example.pointvisualizer.ui.enterpoints.state.ErrorType
+import com.example.pointvisualizer.ui.navigation.GraphScreen
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -93,23 +92,17 @@ class EnterPointsFragment : Fragment() {
     }
 
     private fun hideKeyboard() {
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        val view = requireActivity().currentFocus
-        inputMethodManager?.hideSoftInputFromWindow(
-            view?.windowToken,
-            InputMethodManager.HIDE_NOT_ALWAYS
-        )
+//        val inputMethodManager =
+//            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+//        val view = requireActivity().currentFocus
+//        inputMethodManager?.hideSoftInputFromWindow(
+//            view?.windowToken,
+//            InputMethodManager.HIDE_NOT_ALWAYS
+//        )
     }
 
     private fun navigateToGraphFragment(points: PointsList) {
-        val bundle = Bundle().apply {
-            putParcelable(POINTS_ARGS, points)
-        }
-        findNavController().navigate(
-            R.id.action_EnterPointsFragment_to_GraphFragment,
-            bundle
-        )
+        findNavController().navigate(route = GraphScreen(points = points))
     }
 
     private fun updateUI(screenState: EnterPointsScreenState) {
