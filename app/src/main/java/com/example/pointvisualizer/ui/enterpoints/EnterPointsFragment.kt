@@ -1,9 +1,11 @@
 package com.example.pointvisualizer.ui.enterpoints
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -11,26 +13,19 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import com.example.pointvisualizer.R
 import com.example.pointvisualizer.databinding.FragmentEnterPointsBinding
-import com.example.pointvisualizer.features.points.entities.PointsList
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsRequestState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
 import com.example.pointvisualizer.ui.enterpoints.state.ErrorType
-import com.example.pointvisualizer.ui.navigation.GraphScreen
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class EnterPointsFragment : Fragment() {
-
-    companion object {
-        const val POINTS_ARGS = "POINTS"
-    }
 
     private var _binding: FragmentEnterPointsBinding? = null
     private val binding get() = _binding!!
@@ -69,22 +64,21 @@ class EnterPointsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.enteredPointsEvent.collect { event ->
-                    if (event is EnteredPointsEvent.NavigateToGraphFragment) {
-                        navigateToGraphFragment(event.points)
-                    }
-                    if (event is EnteredPointsEvent.Error) {
-                        hideKeyboard()
-                        val errorMessage = when (val errorType = event.errorType) {
-                            is ErrorType.Network -> getString(R.string.error_network)
-                            is ErrorType.Server -> {
-                                val serverMessage =
-                                    errorType.message ?: getString(R.string.error_unexpected)
-                                getString(R.string.error_server, serverMessage)
-                            }
+                    when (event) {
+                        is EnteredPointsEvent.Error -> {
+                            hideKeyboard()
+                            val errorMessage = when (val errorType = event.errorType) {
+                                is ErrorType.Network -> getString(R.string.error_network)
+                                is ErrorType.Server -> {
+                                    val serverMessage =
+                                        errorType.message ?: getString(R.string.error_unexpected)
+                                    getString(R.string.error_server, serverMessage)
+                                }
 
-                            is ErrorType.Unexpected -> getString(R.string.error_unexpected)
+                                is ErrorType.Unexpected -> getString(R.string.error_unexpected)
+                            }
+                            Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
                         }
-                        Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
                     }
                 }
             }
@@ -92,17 +86,13 @@ class EnterPointsFragment : Fragment() {
     }
 
     private fun hideKeyboard() {
-//        val inputMethodManager =
-//            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-//        val view = requireActivity().currentFocus
-//        inputMethodManager?.hideSoftInputFromWindow(
-//            view?.windowToken,
-//            InputMethodManager.HIDE_NOT_ALWAYS
-//        )
-    }
-
-    private fun navigateToGraphFragment(points: PointsList) {
-        findNavController().navigate(route = GraphScreen(points = points))
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val view = requireActivity().currentFocus
+        inputMethodManager?.hideSoftInputFromWindow(
+            view?.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS
+        )
     }
 
     private fun updateUI(screenState: EnterPointsScreenState) {

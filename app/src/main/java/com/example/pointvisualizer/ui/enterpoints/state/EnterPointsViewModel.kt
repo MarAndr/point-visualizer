@@ -3,6 +3,8 @@ package com.example.pointvisualizer.ui.enterpoints.state
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pointvisualizer.features.points.abstractions.IPointsDataRepository
+import com.example.pointvisualizer.ui.common.navigation.AppNavigator
+import com.example.pointvisualizer.ui.common.navigation.NavigationTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class EnterPointsViewModel @Inject constructor(
     private val repository: IPointsDataRepository,
+    private val appNavigator: AppNavigator,
 ) : ViewModel() {
 
     companion object {
@@ -39,7 +42,7 @@ internal class EnterPointsViewModel @Inject constructor(
             validInput = EnterPointsValidationState(
                 isNotEmpty = enteredPoints.isNotBlank(),
                 isLessThanMax = enteredPointsInt != null && enteredPointsInt <= ENTERED_POINTS_COUNT_MAX,
-                isMoreThanMin =  enteredPointsInt != null && enteredPointsInt >= ENTERED_POINTS_COUNT_MIN,
+                isMoreThanMin = enteredPointsInt != null && enteredPointsInt >= ENTERED_POINTS_COUNT_MIN,
             ),
             enterPointsState = pointsRequest,
         )
@@ -55,23 +58,29 @@ internal class EnterPointsViewModel @Inject constructor(
                 pointsRequestState.value = EnterPointsRequestState.Data(
                     points = points
                 )
-                _enteredPointsEvent.emit(EnteredPointsEvent.NavigateToGraphFragment(points))
+                appNavigator.navigateTo(NavigationTarget.GraphScreen(points))
             } catch (e: HttpException) {
                 pointsRequestState.value = EnterPointsRequestState.Idle
                 val errorBody = e.response()?.errorBody()?.string()
-                _enteredPointsEvent.emit(EnteredPointsEvent.Error(
-                    ErrorType.Server(errorBody)
-                ))
+                _enteredPointsEvent.emit(
+                    EnteredPointsEvent.Error(
+                        ErrorType.Server(errorBody)
+                    )
+                )
             } catch (e: IOException) {
                 pointsRequestState.value = EnterPointsRequestState.Idle
-                _enteredPointsEvent.emit(EnteredPointsEvent.Error(
-                    ErrorType.Network
-                ))
+                _enteredPointsEvent.emit(
+                    EnteredPointsEvent.Error(
+                        ErrorType.Network
+                    )
+                )
             } catch (e: Exception) {
                 pointsRequestState.value = EnterPointsRequestState.Idle
-                _enteredPointsEvent.emit(EnteredPointsEvent.Error(
-                    ErrorType.Unexpected
-                ))
+                _enteredPointsEvent.emit(
+                    EnteredPointsEvent.Error(
+                        ErrorType.Unexpected
+                    )
+                )
             }
         }
     }
