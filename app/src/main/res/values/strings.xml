@@ -17,4 +17,6 @@
     <string name="error_network">Ошибка сети: проверьте ваше подключение.</string>
     <string name="error_server">Ошибка сервера: %1$s</string>
     <string name="error_unexpected">Произошла непредвиденная ошибка.</string>
+    <string name="file_save_success">Файл успешно сохранён</string>
+    <string name="file_save_fail">Ошибка: %1$s</string>
 </resources>

@@ -20,7 +20,7 @@ import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
 import com.example.pointvisualizer.ui.enterpoints.state.ErrorType
-import com.google.android.material.snackbar.Snackbar
+import com.example.pointvisualizer.ui.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -77,7 +77,7 @@ class EnterPointsFragment : Fragment() {
 
                                 is ErrorType.Unexpected -> getString(R.string.error_unexpected)
                             }
-                            Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
+                            showSnackbar(binding.root, errorMessage)
                         }
                     }
                 }

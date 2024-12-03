@@ -21,13 +21,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pointvisualizer.R
 import com.example.pointvisualizer.databinding.FragmentGraphBinding
 import com.example.pointvisualizer.features.points.entities.Point
+import com.example.pointvisualizer.ui.graph.state.GraphScreenEvent
 import com.example.pointvisualizer.ui.graph.state.GraphViewModel
+import com.example.pointvisualizer.ui.utils.showSnackbar
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
+@AndroidEntryPoint
 class GraphFragment : Fragment() {
 
     private var _binding: FragmentGraphBinding? = null
@@ -75,6 +79,21 @@ class GraphFragment : Fragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.graphEvent.collect { event ->
+                    when (event) {
+                        is GraphScreenEvent.FileSaveSuccess -> {
+                            showSnackbar(requireView(), getString(R.string.file_save_success))
+                        }
+                        is GraphScreenEvent.FileSaveFailure -> {
+                            showSnackbar(requireView(), getString(R.string.file_save_fail, event.error))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun setUpAdapter() {
@@ -99,14 +118,7 @@ class GraphFragment : Fragment() {
             }
         }
 
-        try {
-            val outputStream = requireContext().contentResolver.openOutputStream(uri)!!
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        viewModel.saveGraph(uri, bitmap)
     }
 
     private fun createFile() {
