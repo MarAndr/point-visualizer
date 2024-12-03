@@ -12,7 +12,7 @@ import com.example.pointvisualizer.features.points.entities.Point
 import java.text.NumberFormat
 import java.util.Locale
 
-class PointsAdapter : ListAdapter<Point, RecyclerView.ViewHolder>(PointsDiffCallback()) {
+class PointsTableAdapter : ListAdapter<Point, RecyclerView.ViewHolder>(PointsDiffCallback()) {
 
     companion object {
         const val TYPE_HEADER = 0

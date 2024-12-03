@@ -37,7 +37,7 @@ class GraphFragment : Fragment() {
     private val viewModel by viewModels<GraphViewModel>()
 
     private val adapter by lazy {
-        PointsAdapter()
+        PointsTableAdapter()
     }
 
     private val fileSaveResult = registerForActivityResult(StartActivityForResult()) { result ->
@@ -61,21 +61,7 @@ class GraphFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.pointsTable.adapter = adapter
-        binding.pointsTable.layoutManager = LinearLayoutManager(requireContext())
-        val dividerItemDecoration =
-            DividerItemDecoration(binding.pointsTable.context, DividerItemDecoration.VERTICAL)
-        binding.pointsTable.addItemDecoration(dividerItemDecoration)
-
-        binding.lineChart.isDragEnabled = true
-        binding.lineChart.description.isEnabled = false
-        binding.lineChart.legend.isEnabled = false
-        binding.lineChart.xAxis.textColor =
-            ContextCompat.getColor(requireContext(), R.color.onBackground)
-        binding.lineChart.axisLeft.textColor =
-            ContextCompat.getColor(requireContext(), R.color.onBackground)
-        binding.lineChart.axisRight.textColor =
-            ContextCompat.getColor(requireContext(), R.color.onBackground)
+        setUpAdapter()
 
         binding.saveToFile.setOnClickListener {
             createFile()
@@ -88,6 +74,16 @@ class GraphFragment : Fragment() {
                     setUpGraph(state.points)
                 }
             }
+        }
+    }
+
+    private fun setUpAdapter() {
+        with(binding){
+            pointsTable.adapter = adapter
+            pointsTable.layoutManager = LinearLayoutManager(requireContext())
+            val dividerItemDecoration =
+                DividerItemDecoration(pointsTable.context, DividerItemDecoration.VERTICAL)
+            pointsTable.addItemDecoration(dividerItemDecoration)
         }
     }
 
@@ -135,9 +131,19 @@ class GraphFragment : Fragment() {
             valueTextSize = 0f
             circleRadius = 2f
         }
-
-        binding.lineChart.data = LineData(dataSet)
-        binding.lineChart.invalidate()
+        with(binding.lineChart){
+            isDragEnabled = true
+            description.isEnabled = false
+            legend.isEnabled = false
+            xAxis.textColor =
+                ContextCompat.getColor(requireContext(), R.color.onBackground)
+            axisLeft.textColor =
+                ContextCompat.getColor(requireContext(), R.color.onBackground)
+            axisRight.textColor =
+                ContextCompat.getColor(requireContext(), R.color.onBackground)
+            data = LineData(dataSet)
+            invalidate()
+        }
     }
 
     override fun onDestroyView() {
