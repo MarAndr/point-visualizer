@@ -6,14 +6,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.example.pointvisualizer.features.core.loading.LoadingState
+import com.example.pointvisualizer.features.core.loading.launchable
 import com.example.pointvisualizer.features.points.entities.PointsList
 import com.example.pointvisualizer.ui.activity.PointsListNavType
 import com.example.pointvisualizer.ui.common.data.IFileManager
 import com.example.pointvisualizer.ui.common.navigation.NavigationTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.reflect.typeOf
@@ -24,8 +29,10 @@ class GraphViewModel @Inject constructor(
     private val fileManager: IFileManager,
 ) : ViewModel() {
 
-    private val _graphEvent = MutableSharedFlow<GraphScreenEvent>()
-    val graphEvent: SharedFlow<GraphScreenEvent> = _graphEvent
+    private val saveParams = MutableSharedFlow<Pair<Uri, Bitmap>>()
+    private val savingFlow = launchable(saveParams) { (uri, bitmap) ->
+        fileManager.saveBitmapToUri(uri, bitmap)
+    }
 
     private val savedPoints by lazy {
         val screen = savedStateHandle.toRoute<NavigationTarget.GraphScreen>(
@@ -35,20 +42,39 @@ class GraphViewModel @Inject constructor(
         pointsList.points.sortedBy { it.x }
     }
 
-    val points = flowOf(
-        GraphScreenState(
-            points = savedPoints,
+    val screenEventFlow: Flow<GraphScreenEvent> = savingFlow.flow
+        .mapNotNull {
+            when (it) {
+                is LoadingState.Data -> GraphScreenEvent.FileSaveSuccess
+                is LoadingState.Error -> GraphScreenEvent.FileSaveFailure(
+                    it.e.message ?: "Unknown Error"
+                )
+
+                LoadingState.Idle -> null
+                LoadingState.Loading -> null
+            }
+        }
+
+    val screenState = savingFlow.flow
+        .map { savingState ->
+            GraphScreenState(
+                points = savedPoints,
+                savingLoadingState = savingState,
+            )
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            initialValue = GraphScreenState(
+                points = savedPoints,
+                savingLoadingState = LoadingState.Idle,
+            )
         )
-    )
 
     fun saveGraph(uri: Uri, bitmap: Bitmap) {
         viewModelScope.launch {
-            val result = fileManager.saveBitmapToUri(uri, bitmap)
-            if (result.isSuccess) {
-                _graphEvent.emit(GraphScreenEvent.FileSaveSuccess)
-            } else {
-                _graphEvent.emit(GraphScreenEvent.FileSaveFailure(result.exceptionOrNull()?.message ?: "Unknown Error"))
-            }
+            saveParams.emit(uri to bitmap)
+            savingFlow.launch()
         }
     }
 }

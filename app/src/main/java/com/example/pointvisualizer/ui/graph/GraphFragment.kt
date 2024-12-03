@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pointvisualizer.R
 import com.example.pointvisualizer.databinding.FragmentGraphBinding
+import com.example.pointvisualizer.features.core.loading.LoadingState
 import com.example.pointvisualizer.features.points.entities.Point
 import com.example.pointvisualizer.ui.graph.state.GraphScreenEvent
 import com.example.pointvisualizer.ui.graph.state.GraphViewModel
@@ -59,7 +61,7 @@ class GraphFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGraphBinding.inflate(inflater, container, false)
-            return binding.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,22 +75,31 @@ class GraphFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.points.collect { state ->
+                viewModel.screenState.collect { state ->
                     adapter.submitList(state.points)
                     setUpGraph(state.points)
+
+                    binding.saveToFile.isEnabled =
+                        state.savingLoadingState !is LoadingState.Loading
+                    binding.loadingIndicator.isVisible =
+                        state.savingLoadingState is LoadingState.Loading
                 }
             }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.graphEvent.collect { event ->
+                viewModel.screenEventFlow.collect { event ->
                     when (event) {
                         is GraphScreenEvent.FileSaveSuccess -> {
                             showSnackbar(requireView(), getString(R.string.file_save_success))
                         }
+
                         is GraphScreenEvent.FileSaveFailure -> {
-                            showSnackbar(requireView(), getString(R.string.file_save_fail, event.error))
+                            showSnackbar(
+                                requireView(),
+                                getString(R.string.file_save_fail, event.error)
+                            )
                         }
                     }
                 }
@@ -97,7 +108,7 @@ class GraphFragment : Fragment() {
     }
 
     private fun setUpAdapter() {
-        with(binding){
+        with(binding) {
             pointsTable.adapter = adapter
             pointsTable.layoutManager = LinearLayoutManager(requireContext())
             val dividerItemDecoration =
@@ -143,7 +154,7 @@ class GraphFragment : Fragment() {
             valueTextSize = 0f
             circleRadius = 2f
         }
-        with(binding.lineChart){
+        with(binding.lineChart) {
             isDragEnabled = true
             description.isEnabled = false
             legend.isEnabled = false
