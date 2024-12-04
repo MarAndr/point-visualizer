@@ -1,10 +1,9 @@
-package com.example.pointvisualizer.features.core.loading
+package com.example.pointvisualizer.core.loading
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
-
 
 fun <T, P> launchable(
     paramsFlow: Flow<P>,

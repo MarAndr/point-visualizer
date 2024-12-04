@@ -1,6 +1,6 @@
 package com.example.pointvisualizer.ui.enterpoints.state
 
-import com.example.pointvisualizer.features.core.loading.LoadingState
+import com.example.pointvisualizer.core.loading.LoadingState
 import com.example.pointvisualizer.features.points.entities.PointsList
 
 data class EnterPointsScreenState(

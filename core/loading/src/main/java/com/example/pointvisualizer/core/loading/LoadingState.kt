@@ -1,6 +1,4 @@
-package com.example.pointvisualizer.features.core.loading
-
-import com.example.pointvisualizer.features.core.network.ErrorType
+package com.example.pointvisualizer.core.loading
 
 sealed interface LoadingState<out T> {
     data object Idle : LoadingState<Nothing>
@@ -11,7 +9,7 @@ sealed interface LoadingState<out T> {
 
 fun <T, S> LoadingState<T>.map(mapper: (T) -> S): LoadingState<S> = when(this) {
     is LoadingState.Data -> LoadingState.Data(data = mapper(data))
-    is LoadingState.Error ->LoadingState.Error(errorType)
+    is LoadingState.Error -> LoadingState.Error(errorType)
     LoadingState.Idle -> LoadingState.Idle
     LoadingState.Loading -> LoadingState.Loading
 }

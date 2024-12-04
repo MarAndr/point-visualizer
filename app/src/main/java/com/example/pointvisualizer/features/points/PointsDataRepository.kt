@@ -1,6 +1,6 @@
 package com.example.pointvisualizer.features.points
 
-import com.example.pointvisualizer.features.core.loading.map
+import com.example.pointvisualizer.core.loading.map
 import com.example.pointvisualizer.features.points.abstractions.IPointsDataRepository
 import com.example.pointvisualizer.features.points.api.abstractions.IPointsDataSource
 import com.example.pointvisualizer.features.points.entities.Point

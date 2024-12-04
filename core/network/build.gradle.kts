@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.android)
@@ -8,19 +8,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pointvisualizer"
+    namespace = "com.example.pointvisualizer.core.network"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.pointvisualizer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -37,28 +33,16 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 kapt {
-   correctErrorTypes = true
+    correctErrorTypes = true
 }
 
 dependencies {
     implementation(project(":core:loading"))
-    implementation(project(":core:network"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.recyclerview)
-    implementation(libs.material)
-
-    implementation(libs.mpandroidchart)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
@@ -70,6 +54,4 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

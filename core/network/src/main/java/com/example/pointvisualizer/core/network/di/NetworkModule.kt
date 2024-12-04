@@ -1,4 +1,4 @@
-package com.example.pointvisualizer.features.core.di
+package com.example.pointvisualizer.core.network.di
 
 import dagger.Module
 import dagger.Provides

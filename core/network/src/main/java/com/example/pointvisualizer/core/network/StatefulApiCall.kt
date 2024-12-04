@@ -1,7 +1,7 @@
-package com.example.pointvisualizer.features.core.network
+package com.example.pointvisualizer.core.network
 
-import android.net.Uri
-import com.example.pointvisualizer.features.core.loading.LoadingState
+import com.example.pointvisualizer.core.loading.ErrorType
+import com.example.pointvisualizer.core.loading.LoadingState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -21,14 +21,6 @@ fun <T> statefulApiCall(
     } catch (e: IOException) {
         emit(LoadingState.Error(ErrorType.Network))
     } catch (e: Exception) {
-        emit(LoadingState.Error(ErrorType.Unexpected))
+        emit(LoadingState.Error(ErrorType.Unexpected(e)))
     }
 }.distinctUntilChanged()
-
-sealed class ErrorType {
-    data object Network : ErrorType()
-    class Server(val message: String?) : ErrorType()
-    data class UnableToOpenFile(val uri: Uri) : ErrorType()
-    data object UnableToSaveGraphToFile : ErrorType()
-    data object Unexpected : ErrorType()
-}

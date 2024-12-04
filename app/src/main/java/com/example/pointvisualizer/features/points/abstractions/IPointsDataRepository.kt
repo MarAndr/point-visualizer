@@ -1,6 +1,6 @@
 package com.example.pointvisualizer.features.points.abstractions
 
-import com.example.pointvisualizer.features.core.loading.LoadingState
+import com.example.pointvisualizer.core.loading.LoadingState
 import com.example.pointvisualizer.features.points.entities.PointsList
 import kotlinx.coroutines.flow.Flow
 

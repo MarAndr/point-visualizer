@@ -6,8 +6,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.pointvisualizer.features.core.loading.LoadingState
-import com.example.pointvisualizer.features.core.loading.launchable
+import com.example.pointvisualizer.core.loading.LoadingState
+import com.example.pointvisualizer.core.loading.launchable
 import com.example.pointvisualizer.features.points.entities.PointsList
 import com.example.pointvisualizer.ui.activity.PointsListNavType
 import com.example.pointvisualizer.ui.common.data.IFileManager

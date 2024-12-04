@@ -20,9 +20,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pointvisualizer.R
+import com.example.pointvisualizer.core.loading.ErrorType
+import com.example.pointvisualizer.core.loading.LoadingState
 import com.example.pointvisualizer.databinding.FragmentGraphBinding
-import com.example.pointvisualizer.features.core.loading.LoadingState
-import com.example.pointvisualizer.features.core.network.ErrorType
 import com.example.pointvisualizer.features.points.entities.Point
 import com.example.pointvisualizer.ui.graph.state.GraphScreenEvent
 import com.example.pointvisualizer.ui.graph.state.GraphViewModel
@@ -97,8 +97,8 @@ class GraphFragment : Fragment() {
                         }
 
                         is GraphScreenEvent.FileSaveFailure -> {
-                            val errorMessage = if (event.errorType is ErrorType.UnableToOpenFile){
-                                getString(R.string.file_save_fail, event.errorType.uri)
+                            val errorMessage = if (event.errorType is ErrorType.Unexpected){
+                                getString(R.string.file_save_fail, "") // todo
                             } else{
                                 getString(R.string.error_unexpected)
                             }

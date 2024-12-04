@@ -1,6 +1,6 @@
 package com.example.pointvisualizer.features.points.api
 
-import com.example.pointvisualizer.features.core.network.statefulApiCall
+import com.example.pointvisualizer.core.network.statefulApiCall
 import com.example.pointvisualizer.features.points.api.abstractions.IPointsDataSource
 import com.example.pointvisualizer.features.points.api.retrofit.PointsApi
 import javax.inject.Inject

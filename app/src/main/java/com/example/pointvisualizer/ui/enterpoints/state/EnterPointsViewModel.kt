@@ -2,8 +2,8 @@ package com.example.pointvisualizer.ui.enterpoints.state
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pointvisualizer.features.core.loading.LoadingState
-import com.example.pointvisualizer.features.core.loading.launchable
+import com.example.pointvisualizer.core.loading.LoadingState
+import com.example.pointvisualizer.core.loading.launchable
 import com.example.pointvisualizer.features.points.abstractions.IPointsDataRepository
 import com.example.pointvisualizer.ui.common.navigation.AppNavigator
 import com.example.pointvisualizer.ui.common.navigation.NavigationTarget

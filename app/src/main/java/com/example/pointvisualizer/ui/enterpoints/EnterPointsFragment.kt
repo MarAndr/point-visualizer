@@ -14,9 +14,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.pointvisualizer.R
+import com.example.pointvisualizer.core.loading.ErrorType
+import com.example.pointvisualizer.core.loading.LoadingState
 import com.example.pointvisualizer.databinding.FragmentEnterPointsBinding
-import com.example.pointvisualizer.features.core.loading.LoadingState
-import com.example.pointvisualizer.features.core.network.ErrorType
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent

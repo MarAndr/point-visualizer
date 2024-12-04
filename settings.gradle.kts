@@ -24,4 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "PointVisualizer"
 include(":app")
- 
+
+include(":core:loading")
+include(":core:network")
