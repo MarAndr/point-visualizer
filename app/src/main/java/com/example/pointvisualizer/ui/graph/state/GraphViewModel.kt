@@ -46,9 +46,7 @@ class GraphViewModel @Inject constructor(
         .mapNotNull {
             when (it) {
                 is LoadingState.Data -> GraphScreenEvent.FileSaveSuccess
-                is LoadingState.Error -> GraphScreenEvent.FileSaveFailure(
-                    it.e.message ?: "Unknown Error"
-                )
+                is LoadingState.Error -> GraphScreenEvent.FileSaveFailure(it.errorType)
 
                 LoadingState.Idle -> null
                 LoadingState.Loading -> null

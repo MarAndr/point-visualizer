@@ -1,21 +1,12 @@
 package com.example.pointvisualizer.ui.enterpoints.state
 
+import com.example.pointvisualizer.features.core.loading.LoadingState
 import com.example.pointvisualizer.features.points.entities.PointsList
 
 data class EnterPointsScreenState(
     val validInput: EnterPointsValidationState,
-    val enterPointsState: EnterPointsRequestState,
+    val enterPointsState: LoadingState<PointsList>,
 )
-
-sealed interface EnterPointsRequestState {
-    data object Idle : EnterPointsRequestState
-
-    data object Loading : EnterPointsRequestState
-
-    data class Data(
-        val points: PointsList,
-    ) : EnterPointsRequestState
-}
 
 data class EnterPointsValidationState(
     val isNotEmpty: Boolean,

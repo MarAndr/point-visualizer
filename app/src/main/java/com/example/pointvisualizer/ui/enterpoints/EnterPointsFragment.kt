@@ -15,11 +15,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.pointvisualizer.R
 import com.example.pointvisualizer.databinding.FragmentEnterPointsBinding
-import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsRequestState
+import com.example.pointvisualizer.features.core.loading.LoadingState
+import com.example.pointvisualizer.features.core.network.ErrorType
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
-import com.example.pointvisualizer.ui.enterpoints.state.ErrorType
 import com.example.pointvisualizer.ui.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ class EnterPointsFragment : Fragment() {
         }
 
         binding.goButton.setOnClickListener {
-            viewModel.getPoints(binding.pointsInput.text.toString())
+            viewModel.getPoints()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -76,6 +76,7 @@ class EnterPointsFragment : Fragment() {
                                 }
 
                                 is ErrorType.Unexpected -> getString(R.string.error_unexpected)
+                                else -> getString(R.string.error_unexpected)
                             }
                             showSnackbar(binding.root, errorMessage)
                         }
@@ -97,7 +98,7 @@ class EnterPointsFragment : Fragment() {
 
     private fun updateUI(screenState: EnterPointsScreenState) {
         binding.goButton.isEnabled = screenState.validInput.isValid &&
-                screenState.enterPointsState !is EnterPointsRequestState.Loading
+                screenState.enterPointsState !is LoadingState.Loading
         binding.pointsInputLayout.error = when {
             !screenState.validInput.isNotEmpty -> {
                 null
@@ -116,10 +117,10 @@ class EnterPointsFragment : Fragment() {
             }
         }
         binding.loadingIndicator.isVisible =
-            screenState.enterPointsState is EnterPointsRequestState.Loading
+            screenState.enterPointsState is LoadingState.Loading
 
         binding.pointsInput.isEnabled =
-            screenState.enterPointsState !is EnterPointsRequestState.Loading
+            screenState.enterPointsState !is LoadingState.Loading
     }
 
     override fun onDestroyView() {

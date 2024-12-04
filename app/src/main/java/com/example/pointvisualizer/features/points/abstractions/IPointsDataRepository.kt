@@ -1,7 +1,9 @@
 package com.example.pointvisualizer.features.points.abstractions
 
+import com.example.pointvisualizer.features.core.loading.LoadingState
 import com.example.pointvisualizer.features.points.entities.PointsList
+import kotlinx.coroutines.flow.Flow
 
 interface IPointsDataRepository {
-    suspend fun getPoints(count: Int): PointsList
+    fun getPoints(count: Int): Flow<LoadingState<PointsList>>
 }

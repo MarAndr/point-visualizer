@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import com.example.pointvisualizer.features.core.loading.LoadingState
+import com.example.pointvisualizer.features.core.network.ErrorType
 import kotlinx.coroutines.flow.flow
 
 class FileManager(private val context: Context) : IFileManager {
@@ -13,9 +14,7 @@ class FileManager(private val context: Context) : IFileManager {
             val outputStream = context.contentResolver.openOutputStream(uri)
             if (outputStream == null) {
                 emit(
-                    LoadingState.Error(
-                        IllegalStateException("Unable to open output stream for the given URI: $uri")
-                    )
+                    LoadingState.Error(ErrorType.UnableToOpenFile(uri))
                 )
                 return@flow
             }
@@ -24,7 +23,7 @@ class FileManager(private val context: Context) : IFileManager {
             outputStream.close()
             emit(LoadingState.Data(Unit))
         } catch (e: Exception) {
-            emit(LoadingState.Error(e))
+            emit(LoadingState.Error(ErrorType.UnableToSaveGraphToFile))
         }
     }
 }

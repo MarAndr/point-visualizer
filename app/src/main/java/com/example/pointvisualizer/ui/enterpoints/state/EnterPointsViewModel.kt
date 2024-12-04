@@ -2,6 +2,8 @@ package com.example.pointvisualizer.ui.enterpoints.state
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pointvisualizer.features.core.loading.LoadingState
+import com.example.pointvisualizer.features.core.loading.launchable
 import com.example.pointvisualizer.features.points.abstractions.IPointsDataRepository
 import com.example.pointvisualizer.ui.common.navigation.AppNavigator
 import com.example.pointvisualizer.ui.common.navigation.NavigationTarget
@@ -10,9 +12,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,15 +31,17 @@ internal class EnterPointsViewModel @Inject constructor(
     }
 
     private val enteredPointsState = MutableStateFlow("")
-    private val pointsRequestState =
-        MutableStateFlow<EnterPointsRequestState>(EnterPointsRequestState.Idle)
+    private val enteredPointsCount = enteredPointsState.mapNotNull { it.toIntOrNull() }
+    private val pointsRequestLaunchable = launchable(enteredPointsCount) { count ->
+        repository.getPoints(count)
+    }
 
     private val _enteredPointsEvent = MutableSharedFlow<EnteredPointsEvent>()
     val enteredPointsEvent: SharedFlow<EnteredPointsEvent> = _enteredPointsEvent
 
     val screenState = combine(
         enteredPointsState,
-        pointsRequestState
+        pointsRequestLaunchable.flow,
     ) { enteredPoints, pointsRequest ->
         val enteredPointsInt = enteredPoints.toIntOrNull()
         EnterPointsScreenState(
@@ -48,41 +54,22 @@ internal class EnterPointsViewModel @Inject constructor(
         )
     }
 
-    fun getPoints(countString: String) {
-        val count = countString.toIntOrNull() ?: return
-
-        viewModelScope.launch {
-            pointsRequestState.value = EnterPointsRequestState.Loading
-            try {
-                val points = repository.getPoints(count)
-                pointsRequestState.value = EnterPointsRequestState.Data(
-                    points = points
-                )
-                appNavigator.navigateTo(NavigationTarget.GraphScreen(points))
-            } catch (e: HttpException) {
-                pointsRequestState.value = EnterPointsRequestState.Idle
-                val errorBody = e.response()?.errorBody()?.string()
-                _enteredPointsEvent.emit(
-                    EnteredPointsEvent.Error(
-                        ErrorType.Server(errorBody)
-                    )
-                )
-            } catch (e: IOException) {
-                pointsRequestState.value = EnterPointsRequestState.Idle
-                _enteredPointsEvent.emit(
-                    EnteredPointsEvent.Error(
-                        ErrorType.Network
-                    )
-                )
-            } catch (e: Exception) {
-                pointsRequestState.value = EnterPointsRequestState.Idle
-                _enteredPointsEvent.emit(
-                    EnteredPointsEvent.Error(
-                        ErrorType.Unexpected
-                    )
-                )
+    init {
+        pointsRequestLaunchable.flow
+            .distinctUntilChanged()
+            .onEach {
+                if (it is LoadingState.Data) {
+                    appNavigator.navigateTo(NavigationTarget.GraphScreen(it.data))
+                }
+                if (it is LoadingState.Error){
+                    _enteredPointsEvent.emit(EnteredPointsEvent.Error(it.errorType))
+                }
             }
-        }
+            .launchIn(viewModelScope)
+    }
+
+    fun getPoints() = viewModelScope.launch {
+        pointsRequestLaunchable.launch()
     }
 
     fun onCountTextChanged(countString: String) {
