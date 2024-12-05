@@ -8,8 +8,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pointsTable"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dp"
         android:layout_marginBottom="16dp"
+        android:layout_weight="1"
         tools:listitem="@layout/item_point" />
 
     <com.github.mikephil.charting.charts.LineChart
