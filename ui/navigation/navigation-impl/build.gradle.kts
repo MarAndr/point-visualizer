@@ -48,20 +48,8 @@ dependencies {
     implementation(project(":ui:navigation:navigation-api"))
     implementation(project(":features:points:points-api"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.recyclerview)
-    implementation(libs.material)
-
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
     implementation(libs.kotlinx.serialization.json)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -50,8 +50,4 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(libs.kotlinx.serialization.json)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }
