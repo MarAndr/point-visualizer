@@ -11,6 +11,7 @@ import javax.inject.Inject
 class PointsDataRepository @Inject constructor(
     private val dataSource: IPointsDataSource,
 ) : IPointsDataRepository {
+    // todo mapping to datasource
     override fun getPoints(count: Int) = dataSource.getPoints(count)
         .map { loadingState ->
             loadingState.map { pointsDto ->

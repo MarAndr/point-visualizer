@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pointvisualizer.core.loading.LoadingState
 import com.example.pointvisualizer.core.loading.launchable
-import com.example.pointvisualizer.features.points.api.IPointsDataRepository
+import com.example.pointvisualizer.features.points.api.usecase.IGetPointsUseCase
 import com.example.pointvisualizer.ui.common.navigation.AppNavigator
 import com.example.pointvisualizer.ui.common.navigation.NavigationTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class EnterPointsViewModel @Inject constructor(
-    private val repository: IPointsDataRepository,
+    private val getPointsUseCase: IGetPointsUseCase,
     private val appNavigator: AppNavigator,
 ) : ViewModel() {
 
@@ -33,7 +33,7 @@ internal class EnterPointsViewModel @Inject constructor(
     private val enteredPointsState = MutableStateFlow("")
     private val enteredPointsCount = enteredPointsState.mapNotNull { it.toIntOrNull() }
     private val pointsRequestLaunchable = launchable(enteredPointsCount) { count ->
-        repository.getPoints(count)
+        getPointsUseCase(count)
     }
 
     private val _enteredPointsEvent = MutableSharedFlow<EnteredPointsEvent>()
@@ -61,7 +61,7 @@ internal class EnterPointsViewModel @Inject constructor(
                 if (it is LoadingState.Data) {
                     appNavigator.navigateTo(NavigationTarget.GraphScreen(it.data))
                 }
-                if (it is LoadingState.Error){
+                if (it is LoadingState.Error) {
                     _enteredPointsEvent.emit(EnteredPointsEvent.Error(it.errorType))
                 }
             }
