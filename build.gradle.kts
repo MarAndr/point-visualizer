@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.jvm) apply false
-    id("com.google.dagger.hilt.android") version "2.51.1" apply false //todo заменить на alias
+    alias(libs.plugins.hilt.android) apply false
     alias(libs.plugins.kotlin.serialization) apply false
 }
 
