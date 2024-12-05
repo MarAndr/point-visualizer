@@ -1,6 +1,6 @@
-package com.example.pointvisualizer.features.points.api.retrofit
+package com.example.pointvisualizer.features.points.impl.api.retrofit
 
-import com.example.pointvisualizer.features.points.api.models.PointResponseDto
+import com.example.pointvisualizer.features.points.impl.api.models.PointResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 

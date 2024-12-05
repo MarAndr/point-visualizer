@@ -27,3 +27,6 @@ include(":app")
 
 include(":core:loading")
 include(":core:network")
+
+include(":features:points:points-api")
+include(":features:points:points-impl")

@@ -1,8 +1,8 @@
-package com.example.pointvisualizer.features.points.api.di
+package com.example.pointvisualizer.features.points.impl.api.di
 
-import com.example.pointvisualizer.features.points.api.PointsDataSource
-import com.example.pointvisualizer.features.points.api.abstractions.IPointsDataSource
-import com.example.pointvisualizer.features.points.api.retrofit.PointsApi
+import com.example.pointvisualizer.features.points.impl.api.PointsDataSource
+import com.example.pointvisualizer.features.points.impl.api.abstractions.IPointsDataSource
+import com.example.pointvisualizer.features.points.impl.api.retrofit.PointsApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

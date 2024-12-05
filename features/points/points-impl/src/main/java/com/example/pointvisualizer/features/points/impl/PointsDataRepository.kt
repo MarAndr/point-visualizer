@@ -1,10 +1,10 @@
-package com.example.pointvisualizer.features.points
+package com.example.pointvisualizer.features.points.impl
 
 import com.example.pointvisualizer.core.loading.map
-import com.example.pointvisualizer.features.points.abstractions.IPointsDataRepository
-import com.example.pointvisualizer.features.points.api.abstractions.IPointsDataSource
+import com.example.pointvisualizer.features.points.api.IPointsDataRepository
 import com.example.pointvisualizer.features.points.entities.Point
 import com.example.pointvisualizer.features.points.entities.PointsList
+import com.example.pointvisualizer.features.points.impl.api.abstractions.IPointsDataSource
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 

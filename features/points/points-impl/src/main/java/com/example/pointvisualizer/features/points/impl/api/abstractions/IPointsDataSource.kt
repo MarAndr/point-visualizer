@@ -1,7 +1,7 @@
-package com.example.pointvisualizer.features.points.api.abstractions
+package com.example.pointvisualizer.features.points.impl.api.abstractions
 
 import com.example.pointvisualizer.core.loading.LoadingState
-import com.example.pointvisualizer.features.points.api.models.PointResponseDto
+import com.example.pointvisualizer.features.points.impl.api.models.PointResponseDto
 import kotlinx.coroutines.flow.Flow
 
 interface IPointsDataSource {

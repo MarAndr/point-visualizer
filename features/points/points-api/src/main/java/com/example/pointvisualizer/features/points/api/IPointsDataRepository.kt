@@ -1,4 +1,4 @@
-package com.example.pointvisualizer.features.points.abstractions
+package com.example.pointvisualizer.features.points.api
 
 import com.example.pointvisualizer.core.loading.LoadingState
 import com.example.pointvisualizer.features.points.entities.PointsList

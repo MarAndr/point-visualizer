@@ -1,4 +1,4 @@
-package com.example.pointvisualizer.features.points.api.models
+package com.example.pointvisualizer.features.points.impl.api.models
 
 import com.google.gson.annotations.SerializedName
 
