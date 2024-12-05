@@ -17,6 +17,7 @@ import com.example.pointvisualizer.ui.common.navigation.NavigationEventProvider
 import com.example.pointvisualizer.ui.common.navigation.NavigationTarget
 import com.example.pointvisualizer.ui.enterpoints.EnterPointsFragment
 import com.example.pointvisualizer.ui.graph.GraphFragment
+import com.example.pointvisualizer.ui.navtype.PointsListNavType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

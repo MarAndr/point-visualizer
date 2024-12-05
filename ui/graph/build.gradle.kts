@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.android)
@@ -8,15 +8,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pointvisualizer"
+    namespace = "com.example.pointvisualizer.ui.graph"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.pointvisualizer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,23 +40,15 @@ android {
 }
 
 kapt {
-   correctErrorTypes = true
+    correctErrorTypes = true
 }
 
 dependencies {
     implementation(project(":core:loading"))
-    implementation(project(":core:network"))
-
     implementation(project(":features:points:points-api"))
-    implementation(project(":features:points:points-impl"))
     implementation(project(":features:files:files-api"))
-    implementation(project(":features:files:files-impl"))
-
     implementation(project(":ui:core"))
     implementation(project(":ui:navigation:navigation-api"))
-    implementation(project(":ui:navigation:navigation-impl"))
-    implementation(project(":ui:enterpoints"))
-    implementation(project(":ui:graph"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -73,10 +62,6 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.logging.interceptor)
 
     implementation(libs.kotlinx.serialization.json)
 
