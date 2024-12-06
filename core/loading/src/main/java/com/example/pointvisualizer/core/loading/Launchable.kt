@@ -1,5 +1,6 @@
 package com.example.pointvisualizer.core.loading
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -20,6 +21,7 @@ interface Launchable<T> {
     suspend fun launch()
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LaunchableImpl<T, P>(
     paramsFlow: Flow<P>,
     action: (P) -> Flow<LoadingState<T>>,

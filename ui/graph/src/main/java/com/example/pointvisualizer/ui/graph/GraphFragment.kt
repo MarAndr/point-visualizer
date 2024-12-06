@@ -14,9 +14,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.withStarted
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pointvisualizer.core.loading.ErrorType
@@ -75,8 +74,8 @@ class GraphFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.screenState.collect { state ->
+            viewModel.screenState.collect { state ->
+                viewLifecycleOwner.lifecycle.withStarted {
                     adapter.submitList(state.points)
                     setUpGraph(state.points)
 
@@ -89,26 +88,30 @@ class GraphFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.screenEventFlow.collect { event ->
-                    when (event) {
-                        is GraphScreenEvent.FileSaveSuccess -> {
-                            showSnackbar(requireView(), getString(CoreR.string.file_save_success))
-                        }
-
-                        is GraphScreenEvent.FileSaveFailure -> {
-                            val errorMessage = if (event.errorType is ErrorType.Unexpected) {
-                                getString(CoreR.string.file_save_fail, "") // todo
-                            } else {
-                                getString(CoreR.string.error_unexpected)
-                            }
-                            showSnackbar(
-                                requireView(),
-                                getString(CoreR.string.file_save_fail, errorMessage)
-                            )
-                        }
-                    }
+            viewModel.screenEventFlow.collect { event ->
+                viewLifecycleOwner.lifecycle.withStarted {
+                    onScreenEvent(event)
                 }
+            }
+        }
+    }
+
+    private fun onScreenEvent(event: GraphScreenEvent) {
+        when (event) {
+            is GraphScreenEvent.FileSaveSuccess -> {
+                showSnackbar(requireView(), getString(CoreR.string.file_save_success))
+            }
+
+            is GraphScreenEvent.FileSaveFailure -> {
+                val errorMessage = if (event.errorType is ErrorType.Unexpected) {
+                    getString(CoreR.string.file_save_fail, "") // todo
+                } else {
+                    getString(CoreR.string.error_unexpected)
+                }
+                showSnackbar(
+                    requireView(),
+                    getString(CoreR.string.file_save_fail, errorMessage)
+                )
             }
         }
     }
