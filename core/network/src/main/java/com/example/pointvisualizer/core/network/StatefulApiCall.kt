@@ -9,7 +9,7 @@ import java.io.IOException
 
 fun <T> statefulApiCall(
     apiCall: suspend () -> T,
-) = flow<LoadingState<T>> {
+) = flow {
     emit(LoadingState.Loading)
 
     try {

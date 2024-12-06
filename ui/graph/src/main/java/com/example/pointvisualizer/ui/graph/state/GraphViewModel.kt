@@ -9,13 +9,15 @@ import androidx.navigation.toRoute
 import com.example.pointvisualizer.core.loading.LoadingState
 import com.example.pointvisualizer.core.loading.launchable
 import com.example.pointvisualizer.features.files.api.IFileManager
-import com.example.pointvisualizer.features.points.entities.PointsList
+import com.example.pointvisualizer.features.points.api.entities.PointsList
 import com.example.pointvisualizer.ui.common.navigation.NavigationTarget
 import com.example.pointvisualizer.ui.navtype.PointsListNavType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -43,6 +45,7 @@ class GraphViewModel @Inject constructor(
     }
 
     val screenEventFlow: Flow<GraphScreenEvent> = savingFlow.flow
+        .flowOn(Dispatchers.IO)
         .mapNotNull {
             when (it) {
                 is LoadingState.Data -> GraphScreenEvent.FileSaveSuccess

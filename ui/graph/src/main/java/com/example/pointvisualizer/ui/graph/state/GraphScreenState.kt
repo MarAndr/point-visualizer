@@ -1,7 +1,7 @@
 package com.example.pointvisualizer.ui.graph.state
 
 import com.example.pointvisualizer.core.loading.LoadingState
-import com.example.pointvisualizer.features.points.entities.Point
+import com.example.pointvisualizer.features.points.api.entities.Point
 
 data class GraphScreenState(
     val points: List<Point>,

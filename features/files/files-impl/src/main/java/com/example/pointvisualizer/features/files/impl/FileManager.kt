@@ -13,22 +13,21 @@ import javax.inject.Inject
 class FileManager @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : IFileManager {
+
     override fun saveBitmapToUri(uri: Uri, bitmap: Bitmap) = flow {
         emit(LoadingState.Loading)
-        try {
-            val outputStream = context.contentResolver.openOutputStream(uri)
-            if (outputStream == null) {
-                emit(
-                    LoadingState.Error(ErrorType.Unexpected(IllegalStateException("Can't open $uri")))
-                )
-                return@flow
-            }
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
-            emit(LoadingState.Data(Unit))
-        } catch (e: Exception) {
-            emit(LoadingState.Error(ErrorType.Unexpected(e)))
+        val result = runCatching {
+            context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            } ?: throw IllegalStateException("Can't open $uri")
         }
+        emit(result.toLoadingState())
     }
+}
+
+private fun <T> Result<T>.toLoadingState(): LoadingState<Unit> {
+    return fold(
+        onSuccess = { LoadingState.Data(Unit) },
+        onFailure = { LoadingState.Error(ErrorType.Unexpected(Exception(it))) }
+    )
 }

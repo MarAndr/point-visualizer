@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pointvisualizer.features.points.entities.Point
+import com.example.pointvisualizer.features.points.api.entities.Point
 import java.text.NumberFormat
 import java.util.Locale
 import com.example.pointvisualizer.ui.core.R as CoreR

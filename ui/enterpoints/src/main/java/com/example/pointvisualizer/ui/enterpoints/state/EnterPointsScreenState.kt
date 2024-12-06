@@ -1,7 +1,7 @@
 package com.example.pointvisualizer.ui.enterpoints.state
 
 import com.example.pointvisualizer.core.loading.LoadingState
-import com.example.pointvisualizer.features.points.entities.PointsList
+import com.example.pointvisualizer.features.points.api.entities.PointsList
 
 data class EnterPointsScreenState(
     val validInput: EnterPointsValidationState,

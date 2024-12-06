@@ -14,22 +14,21 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.withStarted
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.pointvisualizer.core.loading.ErrorType
 import com.example.pointvisualizer.core.loading.LoadingState
-import com.example.pointvisualizer.features.points.entities.Point
+import com.example.pointvisualizer.features.points.api.entities.Point
 import com.example.pointvisualizer.ui.graph.databinding.FragmentGraphBinding
 import com.example.pointvisualizer.ui.graph.state.GraphScreenEvent
+import com.example.pointvisualizer.ui.graph.state.GraphScreenState
 import com.example.pointvisualizer.ui.graph.state.GraphViewModel
+import com.example.pointvisualizer.ui.utils.collectWithStarted
 import com.example.pointvisualizer.ui.utils.showSnackbar
+import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import com.example.pointvisualizer.ui.core.R as CoreR
 
 
@@ -73,27 +72,23 @@ class GraphFragment : Fragment() {
             createFile()
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.screenState.collect { state ->
-                viewLifecycleOwner.lifecycle.withStarted {
-                    adapter.submitList(state.points)
-                    setUpGraph(state.points)
-
-                    binding.saveToFile.isEnabled =
-                        state.savingLoadingState !is LoadingState.Loading
-                    binding.loadingIndicator.isVisible =
-                        state.savingLoadingState is LoadingState.Loading
-                }
-            }
+        viewModel.screenState.collectWithStarted(viewLifecycleOwner) { state ->
+            onScreenState(state)
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.screenEventFlow.collect { event ->
-                viewLifecycleOwner.lifecycle.withStarted {
-                    onScreenEvent(event)
-                }
-            }
+        viewModel.screenEventFlow.collectWithStarted(viewLifecycleOwner) { event ->
+            onScreenEvent(event)
         }
+    }
+
+    private fun onScreenState(state: GraphScreenState) {
+        adapter.submitList(state.points)
+        setUpGraph(state.points)
+
+        binding.saveToFile.isEnabled =
+            state.savingLoadingState !is LoadingState.Loading
+        binding.loadingIndicator.isVisible =
+            state.savingLoadingState is LoadingState.Loading
     }
 
     private fun onScreenEvent(event: GraphScreenEvent) {
@@ -103,14 +98,9 @@ class GraphFragment : Fragment() {
             }
 
             is GraphScreenEvent.FileSaveFailure -> {
-                val errorMessage = if (event.errorType is ErrorType.Unexpected) {
-                    getString(CoreR.string.file_save_fail, "") // todo
-                } else {
-                    getString(CoreR.string.error_unexpected)
-                }
                 showSnackbar(
                     requireView(),
-                    getString(CoreR.string.file_save_fail, errorMessage)
+                    getString(CoreR.string.error_unexpected)
                 )
             }
         }
@@ -163,19 +153,26 @@ class GraphFragment : Fragment() {
             valueTextSize = 0f
             circleRadius = 2f
         }
+
         with(binding.lineChart) {
             isDragEnabled = true
             description.isEnabled = false
             legend.isEnabled = false
-            xAxis.textColor =
-                ContextCompat.getColor(requireContext(), CoreR.color.onBackground)
-            axisLeft.textColor =
-                ContextCompat.getColor(requireContext(), CoreR.color.onBackground)
-            axisRight.textColor =
-                ContextCompat.getColor(requireContext(), CoreR.color.onBackground)
+            setAxisTextColors(CoreR.color.onBackground)
             data = LineData(dataSet)
             invalidate()
         }
+    }
+
+    private fun getColor(colorRes: Int): Int {
+        return ContextCompat.getColor(requireContext(), colorRes)
+    }
+
+    private fun LineChart.setAxisTextColors(colorRes: Int) {
+        val color = getColor(colorRes)
+        xAxis.textColor = color
+        axisLeft.textColor = color
+        axisRight.textColor = color
     }
 
     override fun onDestroyView() {

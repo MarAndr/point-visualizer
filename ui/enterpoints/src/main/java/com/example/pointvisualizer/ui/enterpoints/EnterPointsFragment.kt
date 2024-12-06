@@ -1,27 +1,24 @@
 package com.example.pointvisualizer.ui.enterpoints
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.example.pointvisualizer.core.loading.ErrorType
 import com.example.pointvisualizer.core.loading.LoadingState
+import com.example.pointvisualizer.features.points.api.entities.PointsList
 import com.example.pointvisualizer.ui.enterpoints.databinding.FragmentEnterPointsBinding
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsScreenState
 import com.example.pointvisualizer.ui.enterpoints.state.EnterPointsViewModel
 import com.example.pointvisualizer.ui.enterpoints.state.EnteredPointsEvent
+import com.example.pointvisualizer.ui.utils.collectWithStarted
+import com.example.pointvisualizer.ui.utils.hideKeyboard
 import com.example.pointvisualizer.ui.utils.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import com.example.pointvisualizer.ui.core.R as CoreR
 
 @AndroidEntryPoint
@@ -53,74 +50,63 @@ class EnterPointsFragment : Fragment() {
             viewModel.getPoints()
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.screenState.collect { screenState ->
-                    updateUI(screenState)
-                }
-            }
+        viewModel.screenState.collectWithStarted(viewLifecycleOwner) { screenState ->
+            onScreenState(screenState)
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.enteredPointsEvent.collect { event ->
-                    when (event) {
-                        is EnteredPointsEvent.Error -> {
-                            hideKeyboard()
-                            val errorMessage = when (val errorType = event.errorType) {
-                                is ErrorType.Network -> getString(CoreR.string.error_network)
-                                is ErrorType.Server -> {
-                                    val serverMessage =
-                                        errorType.message ?: getString(CoreR.string.error_unexpected)
-                                    getString(CoreR.string.error_server, serverMessage)
-                                }
-
-                                is ErrorType.Unexpected -> getString(CoreR.string.error_unexpected)
-                                else -> getString(CoreR.string.error_unexpected)
-                            }
-                            showSnackbar(binding.root, errorMessage)
-                        }
-                    }
-                }
-            }
+        viewModel.enteredPointsEvent.collectWithStarted(viewLifecycleOwner) { event ->
+            onScreenEvent(event)
         }
     }
 
-    private fun hideKeyboard() {
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        val view = requireActivity().currentFocus
-        inputMethodManager?.hideSoftInputFromWindow(
-            view?.windowToken,
-            InputMethodManager.HIDE_NOT_ALWAYS
-        )
+    private fun onScreenEvent(event: EnteredPointsEvent) {
+        if (event is EnteredPointsEvent.Error){
+            handleError(event.errorType)
+        }
     }
 
-    private fun updateUI(screenState: EnterPointsScreenState) {
+    private fun handleError(errorType: ErrorType) {
+        hideKeyboard(requireActivity())
+
+        val errorMessage = when (errorType) {
+            is ErrorType.Network -> getString(CoreR.string.error_network)
+            is ErrorType.Server -> formatServerError(errorType)
+            is ErrorType.Unexpected -> getString(CoreR.string.error_unexpected)
+            else -> getString(CoreR.string.error_unexpected)
+        }
+
+        showSnackbar(binding.root, errorMessage)
+    }
+
+    private fun formatServerError(errorType: ErrorType.Server): String {
+        val serverMessage = errorType.message ?: getString(CoreR.string.error_unexpected)
+        return getString(CoreR.string.error_server, serverMessage)
+    }
+
+    private fun onScreenState(screenState: EnterPointsScreenState) {
+        updateGoButtonState(screenState)
+        updatePointsInputError(screenState)
+        updateLoadingState(screenState.enterPointsState)
+    }
+
+    private fun updateGoButtonState(screenState: EnterPointsScreenState) {
         binding.goButton.isEnabled = screenState.validInput.isValid &&
                 screenState.enterPointsState !is LoadingState.Loading
+    }
+
+    private fun updatePointsInputError(screenState: EnterPointsScreenState) {
         binding.pointsInputLayout.error = when {
-            !screenState.validInput.isNotEmpty -> {
-                null
-            }
-
-            !screenState.validInput.isLessThanMax -> {
-                getString(CoreR.string.more_than_1000_points_error)
-            }
-
-            !screenState.validInput.isMoreThanMin -> {
-                getString(CoreR.string.less_than_one_point_error)
-            }
-
-            else -> {
-                null
-            }
+            !screenState.validInput.isNotEmpty -> null
+            !screenState.validInput.isLessThanMax -> getString(CoreR.string.more_than_1000_points_error)
+            !screenState.validInput.isMoreThanMin -> getString(CoreR.string.less_than_one_point_error)
+            else -> null
         }
-        binding.loadingIndicator.isVisible =
-            screenState.enterPointsState is LoadingState.Loading
+    }
 
-        binding.pointsInput.isEnabled =
-            screenState.enterPointsState !is LoadingState.Loading
+    private fun updateLoadingState(loadingState: LoadingState<PointsList>) {
+        val isLoading = loadingState is LoadingState.Loading
+        binding.loadingIndicator.isVisible = isLoading
+        binding.pointsInput.isEnabled = !isLoading
     }
 
     override fun onDestroyView() {

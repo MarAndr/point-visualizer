@@ -1,7 +1,7 @@
 package com.example.pointvisualizer.features.points.api.usecase
 
 import com.example.pointvisualizer.core.loading.LoadingState
-import com.example.pointvisualizer.features.points.entities.PointsList
+import com.example.pointvisualizer.features.points.api.entities.PointsList
 import kotlinx.coroutines.flow.Flow
 
 interface IGetPointsUseCase {

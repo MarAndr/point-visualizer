@@ -3,18 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
     android:padding="16dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pointsTable"
         android:layout_width="0dp"
-        android:layout_margin="16dp"
         android:layout_height="0dp"
+        android:layout_margin="16dp"
         app:layout_constraintBottom_toTopOf="@+id/saveToFile"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/lineChart"
+        app:layout_constraintEnd_toStartOf="@+id/lineChart"
         tools:listitem="@layout/item_point" />
 
     <com.github.mikephil.charting.charts.LineChart
@@ -22,25 +21,24 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
+        app:layout_constraintBottom_toTopOf="@+id/saveToFile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/pointsTable"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/saveToFile"
-        app:layout_constraintEnd_toEndOf="@+id/saveToFile"
-        app:layout_constraintStart_toStartOf="@+id/saveToFile"
-        app:layout_constraintTop_toTopOf="@+id/saveToFile">
+        app:layout_constraintBottom_toBottomOf="@id/saveToFile"
+        app:layout_constraintEnd_toEndOf="@id/saveToFile"
+        app:layout_constraintStart_toStartOf="@id/saveToFile"
+        app:layout_constraintTop_toTopOf="@id/saveToFile">
 
         <ProgressBar
             android:id="@+id/loadingIndicator"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="invisible" />
     </FrameLayout>

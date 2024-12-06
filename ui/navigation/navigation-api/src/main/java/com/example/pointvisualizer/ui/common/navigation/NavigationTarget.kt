@@ -1,6 +1,6 @@
 package com.example.pointvisualizer.ui.common.navigation
 
-import com.example.pointvisualizer.features.points.entities.PointsList
+import com.example.pointvisualizer.features.points.api.entities.PointsList
 import kotlinx.serialization.Serializable
 
 sealed interface NavigationTarget {
