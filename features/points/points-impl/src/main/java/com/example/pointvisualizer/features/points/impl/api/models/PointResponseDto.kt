@@ -9,6 +9,8 @@ data class PointResponseDto(
 )
 
 data class PointDto(
+    @SerializedName("x")
     val x: Float,
+    @SerializedName("y")
     val y: Float,
 )
